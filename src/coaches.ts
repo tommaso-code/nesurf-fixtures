@@ -136,8 +136,7 @@ export function findCoach(key: TeamKey, rows: CoachRow[]): string {
       const rr = r.region.toLowerCase(), kr = key.region.toLowerCase();
       if (rr === kr) s += 3;
       else if (rr.includes(kr)) s += 2;            // "Metro West/South" covers "Metro West"; "Metro" matches any Metro region
-      else if (r.region === "State") s -= 3;
-      else s -= 2;                                  // a different region is a weak match at best
+      else continue;                                // regional team: never borrow a coach from another region
     }
     const lm = LEAGUE_MATCH[key.league];
     if (lm && lm.test(r.league)) s += 2;
