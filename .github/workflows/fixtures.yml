@@ -1,0 +1,48 @@
+name: Build & deploy fixtures
+
+on:
+  schedule:
+    - cron: "7 * * * *"   # hourly at :07 UTC
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - name: Scrape all sources
+        env:
+          PREVIOUS_SNAPSHOT_URL: https://tommaso-code.github.io/nesurf-fixtures/data/fixtures.json
+          GOTSPORT_EVENTS: ${{ vars.GOTSPORT_EVENTS }}
+          COACHES_CSV_URLS: ${{ secrets.COACHES_CSV_URLS }}
+        run: node --experimental-strip-types scripts/build.mts
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
