@@ -110,7 +110,13 @@ async function scrapeGotsport(ev: GsEvent, coachRows: any) {
   const html = await get(url);
   const root = parseHtml(html);
   const out: Fixture[] = [];
-  for (const tr of root.querySelectorAll("table tbody tr")) {
+  const trs = root.querySelectorAll("table tbody tr");
+  if (!trs.length) {
+    const title = root.querySelector("title")?.text?.trim();
+    console.warn(`[gotsport ${ev.id}] 0 rows; len=${html.length} title=${JSON.stringify(title)} head=${JSON.stringify(html.replace(/\s+/g, " ").slice(0, 400))}`);
+    throw new Error(`no schedule rows (title: ${title || "none"})`);
+  }
+  for (const tr of trs) {
     const tds = tr.querySelectorAll("td");
     if (tds.length < 7) continue;
     const matchNo = clean(tds[0].text);
