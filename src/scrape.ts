@@ -110,7 +110,8 @@ async function scrapeGotsport(ev: GsEvent, coachRows: any) {
   const html = await get(url);
   const root = parseHtml(html);
   const out: Fixture[] = [];
-  const trs = root.querySelectorAll("table tbody tr");
+  // raw HTML has no <tbody>; match any table row with the 7 schedule columns
+  const trs = root.querySelectorAll("table tr").filter(tr => tr.querySelectorAll("td").length >= 7);
   if (!trs.length) {
     const title = root.querySelector("title")?.text?.trim();
     console.warn(`[gotsport ${ev.id}] 0 rows; len=${html.length} title=${JSON.stringify(title)} head=${JSON.stringify(html.replace(/\s+/g, " ").slice(0, 400))}`);
