@@ -100,7 +100,7 @@
       </div>
       <div class="meta">
         <div id="updated">Loading…</div>
-        <button id="refreshBtn" title="Data refreshes automatically every hour. Staff with GitHub access can trigger an immediate run here.">Refreshes hourly · run now ↗</button>
+        <button id="refreshBtn" title="Data refreshes every Wednesday morning. Staff with GitHub access can trigger an immediate run here.">Refreshes Wednesdays · run now ↗</button>
       </div>
     </div>
     <div class="kpis" id="kpis"></div>
@@ -138,7 +138,7 @@
 <footer><div class="wrap">
   <div id="srcSummary"></div>
   <details><summary>Data sources &amp; status</summary><ul id="sources"></ul>
-    <p>Data refreshes automatically every hour (GitHub Actions) from GotSport, the ECNL/TGS schedule feed and MLS NEXT Tracker. Coach names come from the 2026-27 Staff Directory. Times are US Eastern.</p>
+    <p>Data refreshes every Wednesday morning (GitHub Actions) from GotSport, the ECNL/TGS schedule feed and MLS NEXT Tracker. Coach names come from the 2026-27 Staff Directory. Times are US Eastern.</p>
   </details>
 </div></footer>
 
@@ -263,7 +263,7 @@
   $("#clear").onclick = ()=>{ Object.assign(state,{q:"",gender:"",age:"",region:"",tier:"",coach:"",ha:"",leagues:new Set()}); persist(); buildFilters(); render(); };
   $("#refreshBtn").onclick = ()=>{ window.open("https://github.com/tommaso-code/nesurf-fixtures/actions/workflows/fixtures.yml","_blank","noopener"); };
   load();
-  setInterval(load, 10*60*1000); // keep the page live if left open
+  setInterval(load, 60*60*1000); // re-check hourly if left open
 })();
 </script>
 </body>
