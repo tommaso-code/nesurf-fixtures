@@ -119,8 +119,8 @@ export function findCoach(key: TeamKey, rows: CoachRow[]): string {
   if (!key.gender || key.age == null) return "";
   // Regional teams: only match within a region the directory actually lists (avoids guessing for e.g. East Boston)
   if (key.region !== "State") {
-    const stem = key.region.toLowerCase().split(" ")[0];
-    if (!rows.some(r => r.region.toLowerCase().includes(stem))) return "";
+    const full = key.region.toLowerCase();
+    if (!rows.some(r => r.region.toLowerCase().includes(full))) return "";
   }
   let best: CoachRow[] = []; let bestScore = -1;
   for (const r of rows) {
@@ -133,9 +133,11 @@ export function findCoach(key: TeamKey, rows: CoachRow[]): string {
     else if (key.tier && rTier && !/pool|gk/.test(rTier)) s -= 2;
     if (key.region === "State") { if (r.region === "State") s += 3; else s -= 3; }
     else {
-      if (r.region.toLowerCase() === key.region.toLowerCase()) s += 3;
-      else if (r.region.toLowerCase().includes(key.region.toLowerCase().split(" ")[0])) s += 1;
+      const rr = r.region.toLowerCase(), kr = key.region.toLowerCase();
+      if (rr === kr) s += 3;
+      else if (rr.includes(kr)) s += 2;            // "Metro West/South" covers "Metro West"; "Metro" matches any Metro region
       else if (r.region === "State") s -= 3;
+      else s -= 2;                                  // a different region is a weak match at best
     }
     const lm = LEAGUE_MATCH[key.league];
     if (lm && lm.test(r.league)) s += 2;
