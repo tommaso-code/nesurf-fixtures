@@ -99,8 +99,9 @@ function finish(f: Omit<Fixture, "sortKey" | "surfTeam" | "opponent" | "isHome" 
 }
 
 async function get(url: string, headers: Record<string, string> = {}) {
-  const res = await fetch(url, { headers: { "user-agent": UA, accept: "text/html,application/json;q=0.9,*/*;q=0.8", ...headers }, signal: AbortSignal.timeout(20000), redirect: "follow" });
+  const res = await fetch(url, { headers: { "user-agent": UA, accept: "text/html,application/json;q=0.9,*/*;q=0.8", "accept-language": "en-US,en;q=0.9", ...headers }, signal: AbortSignal.timeout(20000), redirect: "follow" });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (res.url && res.url !== url) console.warn(`[get] redirected ${url} -> ${res.url}`);
   return res.text();
 }
 
@@ -114,7 +115,9 @@ async function scrapeGotsport(ev: GsEvent, coachRows: any) {
   const trs = root.querySelectorAll("table tr").filter(tr => tr.querySelectorAll("td").length >= 7);
   if (!trs.length) {
     const title = root.querySelector("title")?.text?.trim();
-    console.warn(`[gotsport ${ev.id}] 0 rows; len=${html.length} title=${JSON.stringify(title)} head=${JSON.stringify(html.replace(/\s+/g, " ").slice(0, 400))}`);
+    root.querySelectorAll("script,style,noscript").forEach(n => n.remove());
+    const text = (root.querySelector("body")?.text || root.text).replace(/\s+/g, " ").trim();
+    console.warn(`[gotsport ${ev.id}] 0 rows; len=${html.length} tables=${root.querySelectorAll("table").length} trs=${root.querySelectorAll("tr").length} title=${JSON.stringify(title)}\n  text=${JSON.stringify(text.slice(0, 900))}`);
     throw new Error(`no schedule rows (title: ${title || "none"})`);
   }
   for (const tr of trs) {
