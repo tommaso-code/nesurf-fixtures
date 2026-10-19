@@ -117,10 +117,16 @@ const LEAGUE_MATCH: Record<string, RegExp> = {
 
 export function findCoach(key: TeamKey, rows: CoachRow[]): string {
   if (!key.gender || key.age == null) return "";
+  // Regional teams: only match within a region the directory actually lists (avoids guessing for e.g. East Boston)
+  if (key.region !== "State") {
+    const stem = key.region.toLowerCase().split(" ")[0];
+    if (!rows.some(r => r.region.toLowerCase().includes(stem))) return "";
+  }
   let best: CoachRow[] = []; let bestScore = -1;
   for (const r of rows) {
     if (r.gender !== key.gender) continue;
     if (!r.ages.includes(key.age)) continue;
+    if (r.ages.length > 4 || /\bGK\b/i.test(r.tier)) continue; // skip club-wide / goalkeeper rows
     let s = 0;
     const rTier = r.tier.toLowerCase();
     if (key.tier && rTier.includes(key.tier.toLowerCase())) s += 3;

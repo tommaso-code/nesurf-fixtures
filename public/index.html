@@ -245,8 +245,9 @@
     const ago = data.updatedAt ? Math.round((Date.now()-Date.parse(data.updatedAt))/60000) : null;
     $("#updated").textContent = ago===null ? "No data yet" : `Updated ${ago<1?"just now":ago<60?ago+" min ago":Math.round(ago/60)+" h ago"} · ${new Date(data.updatedAt).toLocaleString("en-US",{timeZone:"America/New_York",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})} ET`;
     const bad = (data.sources||[]).filter(s=>!s.ok);
-    $("#srcSummary").innerHTML = bad.length ? `<span class="bad">⚠ ${bad.length} source${bad.length>1?"s":""} failed on the last refresh — showing last good data for those.</span>` : `<span class="ok">✓ All ${(data.sources||[]).length} sources refreshed successfully.</span>`;
-    $("#sources").innerHTML = (data.sources||[]).map(s=>`<li><span class="${s.ok?"ok":"bad"}">${s.ok?"✓":"✗"}</span> ${esc(s.name)} — ${s.count} games${s.error?` <em>(${esc(s.error)})</em>`:""}</li>`).join("") + (data.coaches?`<li>Coaches: ${data.coaches.count} directory rows (${esc(data.coaches.source)}, as of ${esc(String(data.coaches.asOf).slice(0,10))})</li>`:"");
+    const cap = data.gotsportCapturedAt ? ` GotSport leagues (NAL/NECSL/NEAL/N1) last captured ${new Date(data.gotsportCapturedAt).toLocaleString("en-US",{timeZone:"America/New_York",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})} ET.` : "";
+    $("#srcSummary").innerHTML = (bad.length ? `<span class="bad">⚠ ${bad.length} source${bad.length>1?"s":""} failed on the last refresh — showing last good data for those.</span>` : `<span class="ok">✓ All ${(data.sources||[]).length} sources refreshed successfully.</span>`) + cap;
+    $("#sources").innerHTML = (data.sources||[]).map(s=>`<li><span class="${s.ok?"ok":"bad"}">${s.ok?"✓":"✗"}</span> ${esc(s.name)} — ${s.count} games${s.note?` <em>(${esc(s.note)})</em>`:""}${s.error?` <em>(${esc(s.error)})</em>`:""}</li>`).join("") + (data.coaches?`<li>Coaches: ${data.coaches.count} directory rows (${esc(data.coaches.source)}, as of ${esc(String(data.coaches.asOf).slice(0,10))})</li>`:"");
   }
 
   async function load(){

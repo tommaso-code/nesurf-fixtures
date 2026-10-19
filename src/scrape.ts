@@ -33,7 +33,8 @@ export type Fixture = {
 export type Snapshot = {
   updatedAt: string;
   fixtures: Fixture[];
-  sources: { name: string; ok: boolean; count: number; error?: string; ms: number }[];
+  sources: { name: string; ok: boolean; count: number; error?: string; note?: string; ms: number }[];
+  gotsportCapturedAt?: string;
   coaches: { source: string; asOf: string; count: number };
 };
 
@@ -106,29 +107,17 @@ async function get(url: string, headers: Record<string, string> = {}) {
 }
 
 // ---------- GotSport ----------
-async function scrapeGotsport(ev: GsEvent, coachRows: any) {
-  const url = `https://system.gotsport.com/org_event/events/${ev.id}/schedules?club=${GOTSPORT_CLUB_ID}`;
-  const html = await get(url);
-  const root = parseHtml(html);
+// GotSport serves a CAPTCHA page to datacenter IPs, so the live fetch usually fails from CI.
+// Fallback: rows captured from a real browser session and committed to data/gotsport-raw.json
+// (shape: { fetchedAt, events: { [eventId]: string[][] } }, each row = the 7 schedule columns).
+import gotsportRaw from "../data/gotsport-raw.json" with { type: "json" };
+export const GOTSPORT_CAPTURED_AT: string = (gotsportRaw as any).fetchedAt || "";
+
+function gotsportRowsToFixtures(ev: GsEvent, rows: string[][], coachRows: any, baseUrl: string): Fixture[] {
   const out: Fixture[] = [];
-  // raw HTML has no <tbody>; match any table row with the 7 schedule columns
-  const trs = root.querySelectorAll("table tr").filter(tr => tr.querySelectorAll("td").length >= 7);
-  if (!trs.length) {
-    const title = root.querySelector("title")?.text?.trim();
-    root.querySelectorAll("script,style,noscript").forEach(n => n.remove());
-    const text = (root.querySelector("body")?.text || root.text).replace(/\s+/g, " ").trim();
-    console.warn(`[gotsport ${ev.id}] 0 rows; len=${html.length} tables=${root.querySelectorAll("table").length} trs=${root.querySelectorAll("tr").length} title=${JSON.stringify(title)}\n  text=${JSON.stringify(text.slice(0, 900))}`);
-    throw new Error(`no schedule rows (title: ${title || "none"})`);
-  }
-  for (const tr of trs) {
-    const tds = tr.querySelectorAll("td");
-    if (tds.length < 7) continue;
-    const matchNo = clean(tds[0].text);
-    const timeCell = clean(tds[1].text);
-    const home = clean(tds[2].text), away = clean(tds[4].text);
-    const resTxt = clean(tds[3].text);
-    const venue = clean(tds[5].text);
-    const division = clean(tds[6].text);
+  for (const r of rows) {
+    if (r.length < 7) continue;
+    const [matchNo, timeCell, home, resTxt, away, venue, division] = r.map(clean);
     const date = toIsoDate(timeCell);
     const time = normTime(timeCell);
     let status = "Scheduled";
@@ -138,15 +127,35 @@ async function scrapeGotsport(ev: GsEvent, coachRows: any) {
     let hs: number | null = null, as: number | null = null;
     const sm = resTxt.match(/(\d+)\s*-\s*(\d+)/);
     if (sm) { hs = +sm[1]; as = +sm[2]; if (status === "Scheduled") status = "Played"; }
-    const link = tds[3].querySelector("a")?.getAttribute("href") || "";
     const f = finish({
       id: `gs-${ev.id}-${matchNo}`, source: "gotsport", league: ev.league, leagueLabel: ev.label, event: ev.label, division,
-      date, time, home, away, homeScore: hs, awayScore: as, status, venue,
-      url: link ? `https://system.gotsport.com${link}` : url,
+      date, time, home, away, homeScore: hs, awayScore: as, status, venue, url: baseUrl,
     }, coachRows);
     if (f) out.push(f);
   }
   return out;
+}
+
+async function scrapeGotsport(ev: GsEvent, coachRows: any) {
+  const url = `https://system.gotsport.com/org_event/events/${ev.id}/schedules?club=${GOTSPORT_CLUB_ID}`;
+  let live: string[][] = [];
+  let liveErr = "";
+  try {
+    const html = await get(url);
+    const root = parseHtml(html);
+    // raw HTML has no <tbody>; match any table row with the 7 schedule columns
+    live = root.querySelectorAll("table tr").filter(tr => tr.querySelectorAll("td").length >= 7)
+      .map(tr => tr.querySelectorAll("td").map(td => clean(td.text)));
+    if (!live.length) liveErr = /verify_captchas|Please verify/i.test(html) ? "GotSport CAPTCHA" : "no schedule rows";
+  } catch (e) { liveErr = (e as Error).message; }
+  if (live.length) return gotsportRowsToFixtures(ev, live, coachRows, url);
+
+  const captured: string[][] = ((gotsportRaw as any).events || {})[String(ev.id)] || [];
+  if (!captured.length) throw new Error(`${liveErr}; no captured rows for event ${ev.id}`);
+  console.warn(`[gotsport ${ev.id}] live fetch failed (${liveErr}); using ${captured.length} rows captured ${GOTSPORT_CAPTURED_AT}`);
+  const fx = gotsportRowsToFixtures(ev, captured, coachRows, url);
+  (fx as any).__note = `captured ${GOTSPORT_CAPTURED_AT.slice(0, 10)}`;
+  return fx;
 }
 
 // ---------- ECNL RL (TGS / AthleteOne) ----------
@@ -209,7 +218,7 @@ export async function buildSnapshot(previous?: Snapshot | null): Promise<Snapsho
   ];
   const results = await Promise.all(tasks.map(async t => {
     const t0 = Date.now();
-    try { const fx = await t.run(); fx.forEach(f => (f.src = t.name)); return { name: t.name, ok: true, count: fx.length, ms: Date.now() - t0, fixtures: fx }; }
+    try { const fx = await t.run(); fx.forEach(f => (f.src = t.name)); return { name: t.name, ok: true, count: fx.length, ms: Date.now() - t0, fixtures: fx, note: (fx as any).__note as string | undefined }; }
     catch (e) {
       // keep the last good data for this source so one bad fetch never blanks the page
       const stale = (previous?.fixtures || []).filter(f => f.src === t.name);
@@ -223,6 +232,7 @@ export async function buildSnapshot(previous?: Snapshot | null): Promise<Snapsho
     updatedAt: new Date().toISOString(),
     fixtures,
     sources: results.map(({ fixtures: _f, ...r }) => r),
+    gotsportCapturedAt: GOTSPORT_CAPTURED_AT,
     coaches: { source: coaches.source, asOf: coaches.asOf, count: coaches.rows.length },
   };
 }
