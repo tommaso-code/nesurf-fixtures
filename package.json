@@ -1,0 +1,12 @@
+{
+  "name": "surf-fixtures",
+  "private": true,
+  "type": "module",
+  "version": "1.0.0",
+  "description": "New England Surf – live club fixtures hub (GotSport, ECNL RL, MLS NEXT) with coach names",
+  "dependencies": {
+    "@netlify/blobs": "^8.2.0",
+    "@netlify/functions": "^3.1.0",
+    "node-html-parser": "^7.0.1"
+  }
+}

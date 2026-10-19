@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New England Surf – Fixtures</title>
+<meta name="description" content="All New England Surf club fixtures in one place: NAL, NECSL, NEAL, N1, ECNL RL and MLS NEXT, with coach names.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0b1f3a; --navy-2:#122b4f; --sky:#2ea8e0; --teal:#1b9a8f; --royal:#2448c9;
+    --bg:#f3f5f8; --card:#ffffff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0;
+    --win:#15803d; --loss:#b91c1c; --draw:#a16207; --warn:#b45309;
+    --radius:12px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --bg:#0b1220; --card:#121a2b; --ink:#e6edf7; --muted:#93a1b5; --line:#22304a; --navy:#0b1f3a; }
+  }
+  :root[data-theme="dark"]{ --bg:#0b1220; --card:#121a2b; --ink:#e6edf7; --muted:#93a1b5; --line:#22304a; }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;line-height:1.45}
+  a{color:inherit}
+  header{background:linear-gradient(135deg,var(--navy),var(--navy-2) 60%,#163a6b);color:#fff;padding:22px 16px 18px}
+  .wrap{max-width:1100px;margin:0 auto}
+  .brand{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .crest{width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#5fc6f0,var(--sky) 55%,#0d6fa3);display:grid;place-items:center;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:20px;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+  h1{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:30px;letter-spacing:.5px;margin:0;line-height:1}
+  .sub{opacity:.85;font-size:13px;margin-top:4px}
+  .meta{margin-left:auto;text-align:right;font-size:12px;opacity:.9}
+  .meta button{margin-top:6px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:6px 10px;font:inherit;font-size:12px;cursor:pointer}
+  .meta button:disabled{opacity:.5;cursor:default}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:16px}
+  .kpi{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:10px 12px}
+  .kpi b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:26px;line-height:1}
+  .kpi span{font-size:12px;opacity:.85}
+
+  .controls{position:sticky;top:0;z-index:5;background:var(--bg);padding:12px 16px 8px;border-bottom:1px solid var(--line)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .row + .row{margin-top:8px}
+  .seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{border:0;background:transparent;padding:8px 12px;font:inherit;font-weight:600;font-size:13px;color:var(--muted);cursor:pointer}
+  .seg button.on{background:var(--navy);color:#fff}
+  .chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 11px;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer}
+  .chip.on{border-color:var(--sky);color:var(--navy);background:#e6f5fc}
+  :root[data-theme="dark"] .chip.on,:root:not([data-theme="light"]) .chip.on{background:#13324a;color:#bfe6fa}
+  @media (prefers-color-scheme: light){ :root:not([data-theme="dark"]) .chip.on{background:#e6f5fc;color:var(--navy)} }
+  select,input[type=search]{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink)}
+  input[type=search]{min-width:200px;flex:1}
+  .count{font-size:12.5px;color:var(--muted);margin-left:auto}
+
+  main{padding:14px 16px 60px}
+  .day{margin:18px 0 8px;display:flex;align-items:baseline;gap:10px}
+  .day h2{font-family:"Barlow Condensed",sans-serif;font-size:22px;margin:0;letter-spacing:.3px}
+  .day small{color:var(--muted);font-size:12.5px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;display:grid;grid-template-columns:78px 1fr auto;gap:12px;align-items:center}
+  .time{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:20px;line-height:1.05}
+  .time small{display:block;font-family:Inter;font-weight:500;font-size:11px;color:var(--muted);margin-top:3px}
+  .teams{min-width:0}
+  .t1{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .t2{color:var(--muted);font-size:13.5px;margin-top:2px}
+  .t2 b{color:var(--ink);font-weight:600}
+  .t3{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:12px;color:var(--muted)}
+  .t3 span{display:inline-flex;align-items:center;gap:4px}
+  .badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:2px 7px;border-radius:6px;color:#fff;background:var(--navy)}
+  .badge.ECNL{background:var(--teal)} .badge.MLS{background:#111} .badge.NAL{background:var(--sky)} .badge.NECSL{background:var(--navy-2)} .badge.NEAL{background:#5b21b6} .badge.N1{background:var(--royal)}
+  .ha{font-size:10.5px;font-weight:700;border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--muted)}
+  .coach{font-weight:600;color:var(--ink)}
+  .score{text-align:right;min-width:74px}
+  .score b{font-family:"Barlow Condensed",sans-serif;font-size:24px;line-height:1}
+  .res{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:7px;color:#fff;font-weight:700;font-size:12px;margin-left:6px;vertical-align:middle}
+  .res.W{background:var(--win)} .res.L{background:var(--loss)} .res.D{background:var(--draw)}
+  .status{font-size:11.5px;font-weight:600;color:var(--muted)}
+  .status.Postponed,.status.Cancelled{color:var(--warn)}
+  .empty{color:var(--muted);text-align:center;padding:40px 10px}
+  .teamhdr{margin:22px 0 8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .teamhdr h2{font-family:"Barlow Condensed",sans-serif;font-size:22px;margin:0}
+  .teamhdr .rec{font-size:12.5px;color:var(--muted)}
+  footer{padding:14px 16px 30px;font-size:12px;color:var(--muted)}
+  footer details{margin-top:6px}
+  footer li{margin:2px 0}
+  .ok{color:var(--win)} .bad{color:var(--loss)}
+  @media (max-width:640px){
+    .card{grid-template-columns:62px 1fr;gap:10px}
+    .score{grid-column:1/-1;text-align:left;display:flex;align-items:center;gap:8px}
+    .meta{margin-left:0;text-align:left;width:100%}
+    h1{font-size:26px}
+  }
+  @media print{.controls,.meta button,footer details{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <div class="crest">NES</div>
+      <div>
+        <h1>NEW ENGLAND SURF · FIXTURES</h1>
+        <div class="sub">NAL · NECSL · NEAL · N1 · ECNL RL (Teal) · MLS NEXT — one page, all teams, coach on every game</div>
+      </div>
+      <div class="meta">
+        <div id="updated">Loading…</div>
+        <button id="refreshBtn" title="Pull fresh data from all sources now">Refresh now</button>
+      </div>
+    </div>
+    <div class="kpis" id="kpis"></div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="wrap">
+    <div class="row">
+      <div class="seg" id="viewSeg">
+        <button data-v="week" class="on">This week</button>
+        <button data-v="upcoming">Upcoming</button>
+        <button data-v="results">Results</button>
+        <button data-v="all">All</button>
+        <button data-v="team">By team</button>
+      </div>
+      <input type="search" id="q" placeholder="Search team, opponent, coach, venue…">
+      <span class="count" id="count"></span>
+    </div>
+    <div class="row" id="leagueChips"></div>
+    <div class="row">
+      <select id="gender"><option value="">Boys + Girls</option><option>Boys</option><option>Girls</option></select>
+      <select id="age"><option value="">All ages</option></select>
+      <select id="region"><option value="">All regions</option></select>
+      <select id="tier"><option value="">All tiers</option></select>
+      <select id="coach"><option value="">All coaches</option></select>
+      <select id="ha"><option value="">Home + Away</option><option value="H">Home only</option><option value="A">Away only</option></select>
+      <button class="chip" id="clear">Clear filters</button>
+    </div>
+  </div>
+</div>
+
+<main><div class="wrap" id="list"><div class="empty">Loading fixtures…</div></div></main>
+
+<footer><div class="wrap">
+  <div id="srcSummary"></div>
+  <details><summary>Data sources &amp; status</summary><ul id="sources"></ul>
+    <p>Data refreshes automatically every hour from GotSport, the ECNL/TGS schedule feed and MLS NEXT Tracker. Coach names come from the 2026-27 Staff Directory. Times are US Eastern.</p>
+  </details>
+</div></footer>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const state = { view: "week", q: "", leagues: new Set(), gender: "", age: "", region: "", tier: "", coach: "", ha: "" };
+  let data = { fixtures: [], sources: [], updatedAt: null };
+
+  try { const saved = JSON.parse(localStorage.getItem("nes-fx-filters") || "{}"); Object.assign(state, saved, { leagues: new Set(saved.leagues || []) }); } catch (e) {}
+  const persist = () => { try { localStorage.setItem("nes-fx-filters", JSON.stringify({ ...state, leagues: [...state.leagues] })); } catch (e) {} };
+
+  const LEAGUES = [["NAL","NAL"],["NECSL","NECSL"],["NEAL","NEAL"],["N1","N1"],["ECNL","ECNL RL"],["MLS","MLS NEXT"]];
+  const todayISO = () => new Intl.DateTimeFormat("en-CA",{timeZone:"America/New_York"}).format(new Date());
+  const addDays = (iso,n) => { const d=new Date(iso+"T12:00:00Z"); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10); };
+  const fmtDay = iso => { const d=new Date(iso+"T12:00:00Z"); return d.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric",timeZone:"UTC"}); };
+  const esc = s => String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const shortTeam = s => s.replace(/^New England Surf( SC)?\s*/i,"").trim() || s;
+
+  function buildFilters(){
+    const lc = $("#leagueChips"); lc.innerHTML = "";
+    for (const [k,label] of LEAGUES){
+      const n = data.fixtures.filter(f=>f.league===k).length;
+      const b = document.createElement("button"); b.className="chip"+(state.leagues.has(k)?" on":""); b.textContent=`${label} (${n})`;
+      b.onclick=()=>{ state.leagues.has(k)?state.leagues.delete(k):state.leagues.add(k); b.classList.toggle("on"); persist(); render(); };
+      lc.appendChild(b);
+    }
+    const fill = (id, vals, fmt=v=>v) => { const sel=$(id); const cur=state[id.slice(1)]; sel.querySelectorAll("option:not(:first-child)").forEach(o=>o.remove()); for (const v of vals){ const o=document.createElement("option"); o.value=v; o.textContent=fmt(v); sel.appendChild(o);} sel.value = vals.includes(cur)?cur:""; state[id.slice(1)] = sel.value; };
+    const uniq = (k) => [...new Set(data.fixtures.map(f=>f[k]).filter(v=>v!==null&&v!==""&&v!==undefined))];
+    fill("#age", uniq("age").sort((a,b)=>a-b), v=>"U"+v);
+    fill("#region", uniq("region").sort());
+    fill("#tier", uniq("tier").sort());
+    fill("#coach", uniq("coach").flatMap(c=>c.split(" / ")).filter((v,i,a)=>a.indexOf(v)===i).sort());
+    $("#gender").value = state.gender; $("#ha").value = state.ha; $("#q").value = state.q;
+    document.querySelectorAll("#viewSeg button").forEach(b=>b.classList.toggle("on", b.dataset.v===state.view));
+  }
+
+  function filtered(){
+    const t = todayISO(), q = state.q.trim().toLowerCase();
+    return data.fixtures.filter(f=>{
+      if (state.leagues.size && !state.leagues.has(f.league)) return false;
+      if (state.gender && f.gender!==state.gender) return false;
+      if (state.age && String(f.age)!==String(state.age)) return false;
+      if (state.region && f.region!==state.region) return false;
+      if (state.tier && f.tier!==state.tier) return false;
+      if (state.coach && !(f.coach||"").split(" / ").includes(state.coach)) return false;
+      if (state.ha==="H" && !f.isHome) return false;
+      if (state.ha==="A" && f.isHome) return false;
+      if (q && !`${f.surfTeam} ${f.opponent} ${f.coach} ${f.venue} ${f.division} ${f.leagueLabel}`.toLowerCase().includes(q)) return false;
+      if (state.view==="week") return f.date>=t && f.date<=addDays(t,7);
+      if (state.view==="upcoming") return f.date>=t && f.status!=="Played";
+      if (state.view==="results") return f.status==="Played";
+      return true;
+    });
+  }
+
+  function card(f){
+    const played = f.status==="Played";
+    const score = played ? `<b>${f.homeScore}–${f.awayScore}</b><span class="res ${f.result}">${f.result}</span>` : `<span class="status ${f.status}">${f.status==="Scheduled"?"":f.status}</span>`;
+    const vs = f.isHome ? `vs <b>${esc(f.opponent)}</b>` : `at <b>${esc(f.opponent)}</b>`;
+    return `<div class="card">
+      <div class="time">${f.time||"TBD"}<small>${f.isHome?"HOME":"AWAY"}</small></div>
+      <div class="teams">
+        <div class="t1"><span class="badge ${f.league}">${esc(f.leagueLabel.split(" ")[0]==="ECNL"?"ECNL RL":f.league==="MLS"?"MLS NEXT":f.league)}</span>${esc(shortTeam(f.surfTeam))}</div>
+        <div class="t2">${vs}${f.division?` <span style="opacity:.7">· ${esc(f.division)}</span>`:""}</div>
+        <div class="t3">${f.coach?`<span>👤 <span class="coach">${esc(f.coach)}</span></span>`:`<span>👤 <em>coach not matched</em></span>`}${f.venue?`<span>📍 ${esc(f.venue)}</span>`:""}<span><a href="${esc(f.url)}" target="_blank" rel="noopener" style="color:var(--muted)">source ↗</a></span></div>
+      </div>
+      <div class="score">${score}</div>
+    </div>`;
+  }
+
+  function render(){
+    const list = $("#list"); const rows = filtered();
+    $("#count").textContent = `${rows.length} game${rows.length===1?"":"s"}`;
+    if (!rows.length){ list.innerHTML = `<div class="empty">No games match these filters.</div>`; return; }
+    let html = "";
+    if (state.view==="team"){
+      const byTeam = {}; rows.forEach(f=>(byTeam[f.surfTeam] ||= []).push(f));
+      for (const team of Object.keys(byTeam).sort()){
+        const fx = byTeam[team]; const w=fx.filter(f=>f.result==="W").length,d=fx.filter(f=>f.result==="D").length,l=fx.filter(f=>f.result==="L").length;
+        html += `<div class="teamhdr"><h2>${esc(team)}</h2><span class="badge ${fx[0].league}">${esc(fx[0].league)}</span><span class="rec">${fx[0].coach?"Coach: "+esc(fx[0].coach)+" · ":""}${w}W-${d}D-${l}L · ${fx.length} games</span></div>`;
+        html += fx.map(f=>card(f).replace('<div class="time">', `<div class="time"><small style="margin:0 0 2px">${fmtDay(f.date).replace(/^(\w{3})\w*,/,"$1")}</small>`)).join("");
+      }
+    } else {
+      const sorted = state.view==="results" ? [...rows].reverse() : rows;
+      let cur = "";
+      for (const f of sorted){
+        if (f.date!==cur){ cur=f.date; const n=sorted.filter(x=>x.date===cur).length; html += `<div class="day"><h2>${fmtDay(cur)}</h2><small>${n} game${n===1?"":"s"}${cur===todayISO()?" · today":""}</small></div>`; }
+        html += card(f);
+      }
+    }
+    list.innerHTML = html;
+  }
+
+  function renderMeta(){
+    const t = todayISO();
+    const up = data.fixtures.filter(f=>f.date>=t&&f.status!=="Played");
+    const week = up.filter(f=>f.date<=addDays(t,7));
+    const played = data.fixtures.filter(f=>f.status==="Played");
+    const w=played.filter(f=>f.result==="W").length, d=played.filter(f=>f.result==="D").length, l=played.filter(f=>f.result==="L").length;
+    const teams = new Set(data.fixtures.map(f=>f.surfTeam)).size;
+    $("#kpis").innerHTML = [[week.length,"games next 7 days"],[up.length,"upcoming"],[teams,"teams tracked"],[`${w}-${d}-${l}`,"club record (W-D-L)"],[data.fixtures.length,"fixtures total"]]
+      .map(([v,k])=>`<div class="kpi"><b>${v}</b><span>${k}</span></div>`).join("");
+    const ago = data.updatedAt ? Math.round((Date.now()-Date.parse(data.updatedAt))/60000) : null;
+    $("#updated").textContent = ago===null ? "No data yet" : `Updated ${ago<1?"just now":ago<60?ago+" min ago":Math.round(ago/60)+" h ago"} · ${new Date(data.updatedAt).toLocaleString("en-US",{timeZone:"America/New_York",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})} ET`;
+    const bad = (data.sources||[]).filter(s=>!s.ok);
+    $("#srcSummary").innerHTML = bad.length ? `<span class="bad">⚠ ${bad.length} source${bad.length>1?"s":""} failed on the last refresh — showing last good data for those.</span>` : `<span class="ok">✓ All ${(data.sources||[]).length} sources refreshed successfully.</span>`;
+    $("#sources").innerHTML = (data.sources||[]).map(s=>`<li><span class="${s.ok?"ok":"bad"}">${s.ok?"✓":"✗"}</span> ${esc(s.name)} — ${s.count} games${s.error?` <em>(${esc(s.error)})</em>`:""}</li>`).join("") + (data.coaches?`<li>Coaches: ${data.coaches.count} directory rows (${esc(data.coaches.source)}, as of ${esc(String(data.coaches.asOf).slice(0,10))})</li>`:"");
+  }
+
+  async function load(){
+    try{
+      const r = await fetch("/api/fixtures",{cache:"no-store"}); data = await r.json();
+      buildFilters(); renderMeta(); render();
+    }catch(e){ $("#list").innerHTML = `<div class="empty">Could not load fixtures (${esc(e.message)}). Try refreshing the page.</div>`; }
+  }
+
+  $("#viewSeg").addEventListener("click", e=>{ const b=e.target.closest("button"); if(!b) return; state.view=b.dataset.v; document.querySelectorAll("#viewSeg button").forEach(x=>x.classList.toggle("on",x===b)); persist(); render(); });
+  $("#q").addEventListener("input", e=>{ state.q=e.target.value; persist(); render(); });
+  for (const id of ["gender","age","region","tier","coach","ha"]) $("#"+id).addEventListener("change", e=>{ state[id]=e.target.value; persist(); render(); });
+  $("#clear").onclick = ()=>{ Object.assign(state,{q:"",gender:"",age:"",region:"",tier:"",coach:"",ha:"",leagues:new Set()}); persist(); buildFilters(); render(); };
+  $("#refreshBtn").onclick = async ()=>{
+    const b=$("#refreshBtn"); b.disabled=true; b.textContent="Refreshing…";
+    try{ const r = await fetch("/api/refresh"); const j = await r.json(); if (j.skipped) b.textContent="Already fresh"; else b.textContent="Done"; await load(); }
+    catch(e){ b.textContent="Failed"; }
+    setTimeout(()=>{ b.disabled=false; b.textContent="Refresh now"; }, 2500);
+  };
+  load();
+  setInterval(load, 10*60*1000); // keep the page live if left open
+})();
+</script>
+</body>
+</html>
