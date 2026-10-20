@@ -12,6 +12,7 @@ export type TeamKey = {
   tier: string;      // Navy | Sky | Royal | ""
   region: string;    // State | Charlestown | Metro Boston | ...
   league: string;    // ECNL | MLS | NAL | N1 | NECSL | NEAL
+  division: string;  // flight text from the league schedule, e.g. "flight 3 metro blue" ("" if none)
 };
 
 const SEASON_START_YEAR = 2026; // 2026-27 season: U = 2026 - birthYear
@@ -108,7 +109,10 @@ export function parseTeam(name: string, league: string, divisionHint = ""): Team
     // NECSL teams without an explicit region and without "State" are usually regional "Metro" teams
     if (/\bMetro\b/i.test(n)) region = "Metro";
   }
-  return { gender, age, tier, region, league };
+  // Flight text ("Flight 3 Metro Blue GU14" -> "flight 3 metro blue") lets the directory's League Tier column break ties
+  const fm = divisionHint.match(/flight\s*\d+(?:\s+(?![gb]?u\d)[a-z]+)*/i);
+  const division = fm ? fm[0].toLowerCase().replace(/\s+(girls|boys)$/i, "").trim() : "";
+  return { gender, age, tier, region, league, division };
 }
 
 const LEAGUE_MATCH: Record<string, RegExp> = {
@@ -141,6 +145,7 @@ export function findCoach(key: TeamKey, rows: CoachRow[]): string {
     const lm = LEAGUE_MATCH[key.league];
     if (lm && lm.test(r.league)) s += 2;
     if (r.age.includes("/") || r.age.includes("-")) s -= 0.5; // prefer exact age rows
+    if (key.division && r.leagueTier.toLowerCase().includes(key.division)) s += 4; // directory names this exact flight
     if (s > bestScore) { bestScore = s; best = [r]; }
     else if (s === bestScore) best.push(r);
   }
