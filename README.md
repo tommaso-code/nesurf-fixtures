@@ -5,7 +5,8 @@ One page with every club fixture, pulled hourly from:
 | Source | What | How |
 |---|---|---|
 | GotSport | NAL (55967), NECSL Fall 2026 (55964), NEAL (56083), N1 (54245) | club schedule page, club 7671 |
-| ECNL RL Girls Northeast 2026-27 (event 4310) | Teal division GU13–GU18/19 | TGS / AthleteOne schedule feed |
+| ECNL RL Girls Northeast 2026-27 (org 13, season 82, event 4310) | Teal division GU13–GU18/19 | TGS / AthleteOne schedule feed |
+| Pre-ECNL Girls Northeast 2026-27 (org 21, season 86, event 4379) | North flight GU11–GU12 | TGS / AthleteOne schedule feed |
 | MLS NEXT Academy | U13–U19 | mlsnexttracker.com team API |
 | 2026-27 Staff Directory | coach per team | snapshot in `src/coaches-data.ts` (optional live CSV) |
 
@@ -23,7 +24,7 @@ One page with every club fixture, pulled hourly from:
 | `COACHES_CSV_URLS` | Comma-separated CSV export URLs of link-viewable sheets with the directory column layout | `https://docs.google.com/spreadsheets/d/<id>/gviz/tq?tqx=out:csv&sheet=State%20Boys,...` |
 | `REFRESH_TOKEN` | If set, `/api/refresh` requires `?token=` | any string |
 
-Season rollover: update `ECNL_EVENT`, `ECNL_TEAL_FLIGHTS`, `DEFAULT_GOTSPORT` in `src/scrape.ts` and `SEASON_START_YEAR` in `src/coaches.ts`.
+Season rollover: update `TGS_FEEDS` (ECNL RL + Pre-ECNL event/flight ids), `DEFAULT_GOTSPORT` in `src/scrape.ts` and `SEASON_START_YEAR` in `src/coaches.ts`.
 
 ## Local test
 

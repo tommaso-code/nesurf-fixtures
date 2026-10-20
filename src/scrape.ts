@@ -4,7 +4,7 @@ import { findCoach, loadCoaches, parseTeam } from "./coaches.ts";
 export type Fixture = {
   id: string;
   source: "gotsport" | "ecnl" | "mlsnext";
-  league: "NAL" | "NECSL" | "NEAL" | "N1" | "ECNL" | "MLS";
+  league: "NAL" | "NECSL" | "NEAL" | "N1" | "ECNL" | "PRE" | "MLS";
   leagueLabel: string;
   event: string;
   division: string;
@@ -50,8 +50,17 @@ const DEFAULT_GOTSPORT: GsEvent[] = [
   { id: 54245, league: "N1", label: "N1 Northeast District 1" },
 ];
 const GOTSPORT_CLUB_ID = 7671;
-const ECNL_EVENT = 4310; // ECNL RL Girls Northeast 2026-27
-const ECNL_TEAL_FLIGHTS: Record<string, number> = { GU13: 41761, GU14: 41762, GU15: 41763, GU16: 41764, GU17: 41765, "GU18/19": 41766 };
+// TGS / AthleteOne schedule feeds (theecnl.com). Each entry = one flight.
+// URL shape: /api/Script/get-conference-schedules/<orgId>/<seasonId>/<eventId>/<flightId>/0
+type TgsFeed = { name: string; org: number; season: number; event: number; flight: number; age: string; league: "ECNL" | "PRE"; leagueLabel: string; eventName: string; divisionDefault: string; url: string };
+const ECNL_RL = { org: 13, season: 82, event: 4310, league: "ECNL" as const, leagueLabel: "ECNL RL Girls Northeast – Teal", eventName: "ECNL RL Girls Northeast 2026-27", url: "https://theecnl.com/sports/2023/8/8/ECNLRLG_0808235356.aspx" };
+const PRE_ECNL = { org: 21, season: 86, event: 4379, league: "PRE" as const, leagueLabel: "Pre-ECNL Girls Northeast – North", eventName: "Pre-ECNL Girls Northeast 2026-27", url: "https://theecnl.com/sports/2023/8/8/Pre-ECNLG_0808230711.aspx" };
+const TGS_FEEDS: TgsFeed[] = [
+  ...Object.entries({ GU13: 41761, GU14: 41762, GU15: 41763, GU16: 41764, GU17: 41765, "GU18/19": 41766 })
+    .map(([age, flight]) => ({ ...ECNL_RL, name: `ECNL RL ${age} Teal`, age, flight, divisionDefault: `${age} - Teal` })),
+  ...Object.entries({ GU11: 42032, GU12: 42033 })
+    .map(([age, flight]) => ({ ...PRE_ECNL, name: `Pre-ECNL ${age} North`, age, flight, divisionDefault: `${age} - North` })),
+];
 const MLS_TEAMS = ["u13", "u14", "u15", "u16", "u17", "u19"].map(a => `new-england-surf-sc-${a}`);
 
 function gotsportEvents(): GsEvent[] {
@@ -159,8 +168,8 @@ async function scrapeGotsport(ev: GsEvent, coachRows: any) {
 }
 
 // ---------- ECNL RL (TGS / AthleteOne) ----------
-async function scrapeEcnl(ageLabel: string, flightId: number, coachRows: any) {
-  const url = `https://api.athleteone.com/api/Script/get-conference-schedules/13/82/${ECNL_EVENT}/${flightId}/0`;
+async function scrapeTgs(feed: TgsFeed, coachRows: any) {
+  const url = `https://api.athleteone.com/api/Script/get-conference-schedules/${feed.org}/${feed.season}/${feed.event}/${feed.flight}/0`;
   const html = await get(url, { referer: "https://theecnl.com/", origin: "https://theecnl.com" });
   const root = parseHtml(html);
   const out: Fixture[] = [];
@@ -169,16 +178,16 @@ async function scrapeEcnl(ageLabel: string, flightId: number, coachRows: any) {
     if (tds.length < 4) continue;
     const matchNo = clean(tds[0].text);
     const info = tds[1].querySelectorAll("div").map(d => clean(d.text));
-    const date = toIsoDate(info[0] || ""), time = normTime(info[1] || ""), division = info[2] || `${ageLabel} - Teal`;
+    const date = toIsoDate(info[0] || ""), time = normTime(info[1] || ""), division = info[2] || feed.divisionDefault;
     const teams = tds[2].querySelectorAll(".individual-team-item").map(s => clean(s.text));
     const venue = clean(tds[2].querySelector(".game-complex-item")?.text || "");
     const scores = tds[3].querySelectorAll("div").map(d => clean(d.text)).filter(t => /^\d+$/.test(t));
     const hs = scores.length >= 2 ? +scores[0] : null, as = scores.length >= 2 ? +scores[1] : null;
     const status = hs != null ? "Played" : time ? "Scheduled" : "TBD";
     const f = finish({
-      id: `ecnl-${matchNo}`, source: "ecnl", league: "ECNL", leagueLabel: "ECNL RL Girls Northeast – Teal", event: "ECNL RL Girls Northeast 2026-27", division,
+      id: `${feed.league === "PRE" ? "pre" : "ecnl"}-${matchNo}`, source: "ecnl", league: feed.league, leagueLabel: feed.leagueLabel, event: feed.eventName, division,
       date, time, home: teams[0] || "", away: teams[1] || "", homeScore: hs, awayScore: as, status, venue,
-      url: "https://theecnl.com/sports/2023/8/8/ECNLRLG_0808235356.aspx",
+      url: feed.url,
     }, coachRows);
     if (f) out.push(f);
   }
@@ -213,7 +222,7 @@ export async function buildSnapshot(previous?: Snapshot | null): Promise<Snapsho
   const coaches = await loadCoaches();
   const tasks: { name: string; run: () => Promise<Fixture[]> }[] = [
     ...gotsportEvents().map(ev => ({ name: `GotSport ${ev.label}`, run: () => scrapeGotsport(ev, coaches.rows) })),
-    ...Object.entries(ECNL_TEAL_FLIGHTS).map(([age, id]) => ({ name: `ECNL RL ${age} Teal`, run: () => scrapeEcnl(age, id, coaches.rows) })),
+    ...TGS_FEEDS.map(feed => ({ name: feed.name, run: () => scrapeTgs(feed, coaches.rows) })),
     ...MLS_TEAMS.map(slug => ({ name: `MLS NEXT ${slug.split("-").pop()!.toUpperCase()}`, run: () => scrapeMls(slug, coaches.rows) })),
   ];
   const results = await Promise.all(tasks.map(async t => {

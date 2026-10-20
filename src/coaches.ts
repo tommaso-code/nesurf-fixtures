@@ -82,7 +82,7 @@ export function parseTeam(name: string, league: string, divisionHint = ""): Team
   let gender: TeamKey["gender"] = "";
   if (/\bGirls\b|\bGU\d|\bG20\d\d|\bU\d+G\b/i.test(n) || /\bGU\d/i.test(divisionHint)) gender = "Girls";
   else if (/\bBoys\b|\bBU\d|\bB20\d\d|\bU\d+B\b/i.test(n) || /\bBU\d/i.test(divisionHint)) gender = "Boys";
-  if (!gender && league === "ECNL") gender = "Girls";
+  if (!gender && (league === "ECNL" || league === "PRE")) gender = "Girls";
   if (!gender && league === "MLS") gender = "Boys";
 
   let age: number | null = null;
@@ -97,7 +97,7 @@ export function parseTeam(name: string, league: string, divisionHint = ""): Team
   let tier = (n.match(/\b(Navy|Sky|Royal)\b/i) || [])[1] || "";
   tier = tier ? tier[0].toUpperCase() + tier.slice(1).toLowerCase() : "";
   if (!tier) {
-    if (league === "ECNL" || league === "MLS" || league === "NEAL") tier = "Navy";
+    if (league === "ECNL" || league === "PRE" || league === "MLS" || league === "NEAL") tier = "Navy";
     else if (league === "NAL") tier = "Sky";
     else if (league === "N1") tier = "Royal";
   }
@@ -116,7 +116,7 @@ export function parseTeam(name: string, league: string, divisionHint = ""): Team
 }
 
 const LEAGUE_MATCH: Record<string, RegExp> = {
-  ECNL: /ECNL/i, MLS: /MLS/i, NAL: /\bNAL\b/i, N1: /\bN1\b/i, NEAL: /NEAL/i, NECSL: /NECSL|NESCSL/i,
+  ECNL: /ECNL/i, PRE: /Pre-?\s*ECNL/i, MLS: /MLS/i, NAL: /\bNAL\b/i, N1: /\bN1\b/i, NEAL: /NEAL/i, NECSL: /NECSL|NESCSL/i,
 };
 
 export function findCoach(key: TeamKey, rows: CoachRow[]): string {

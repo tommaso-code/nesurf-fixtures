@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>New England Surf – Fixtures</title>
-<meta name="description" content="All New England Surf club fixtures in one place: NAL, NECSL, NEAL, N1, ECNL RL and MLS NEXT, with coach names.">
+<meta name="description" content="All New England Surf club fixtures in one place: NAL, NECSL, NEAL, N1, ECNL RL, Pre-ECNL and MLS NEXT, with coach names.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -63,7 +63,7 @@
   .t3{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:12px;color:var(--muted)}
   .t3 span{display:inline-flex;align-items:center;gap:4px}
   .badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:2px 7px;border-radius:6px;color:#fff;background:var(--navy)}
-  .badge.ECNL{background:var(--teal)} .badge.MLS{background:#111} .badge.NAL{background:var(--sky)} .badge.NECSL{background:var(--navy-2)} .badge.NEAL{background:#5b21b6} .badge.N1{background:var(--royal)}
+  .badge.ECNL{background:var(--teal)} .badge.PRE{background:#0e7490} .badge.MLS{background:#111} .badge.NAL{background:var(--sky)} .badge.NECSL{background:var(--navy-2)} .badge.NEAL{background:#5b21b6} .badge.N1{background:var(--royal)}
   .ha{font-size:10.5px;font-weight:700;border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--muted)}
   .coach{font-weight:600;color:var(--ink)}
   .score{text-align:right;min-width:74px}
@@ -96,7 +96,7 @@
       <div class="crest">NES</div>
       <div>
         <h1>NEW ENGLAND SURF · FIXTURES</h1>
-        <div class="sub">NAL · NECSL · NEAL · N1 · ECNL RL (Teal) · MLS NEXT — one page, all teams, coach on every game</div>
+        <div class="sub">NAL · NECSL · NEAL · N1 · ECNL RL (Teal) · Pre-ECNL (North) · MLS NEXT — one page, all teams, coach on every game</div>
       </div>
       <div class="meta">
         <div id="updated">Loading…</div>
@@ -151,7 +151,7 @@
   try { const saved = JSON.parse(localStorage.getItem("nes-fx-filters") || "{}"); Object.assign(state, saved, { leagues: new Set(saved.leagues || []) }); } catch (e) {}
   const persist = () => { try { localStorage.setItem("nes-fx-filters", JSON.stringify({ ...state, leagues: [...state.leagues] })); } catch (e) {} };
 
-  const LEAGUES = [["NAL","NAL"],["NECSL","NECSL"],["NEAL","NEAL"],["N1","N1"],["ECNL","ECNL RL"],["MLS","MLS NEXT"]];
+  const LEAGUES = [["NAL","NAL"],["NECSL","NECSL"],["NEAL","NEAL"],["N1","N1"],["ECNL","ECNL RL"],["PRE","Pre-ECNL"],["MLS","MLS NEXT"]];
   const todayISO = () => new Intl.DateTimeFormat("en-CA",{timeZone:"America/New_York"}).format(new Date());
   const addDays = (iso,n) => { const d=new Date(iso+"T12:00:00Z"); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10); };
   const fmtDay = iso => { const d=new Date(iso+"T12:00:00Z"); return d.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric",timeZone:"UTC"}); };
@@ -202,7 +202,7 @@
     return `<div class="card">
       <div class="time">${f.time||"TBD"}<small>${f.isHome?"HOME":"AWAY"}</small></div>
       <div class="teams">
-        <div class="t1"><span class="badge ${f.league}">${esc(f.leagueLabel.split(" ")[0]==="ECNL"?"ECNL RL":f.league==="MLS"?"MLS NEXT":f.league)}</span>${esc(shortTeam(f.surfTeam))}</div>
+        <div class="t1"><span class="badge ${f.league}">${esc(f.league==="ECNL"?"ECNL RL":f.league==="PRE"?"Pre-ECNL":f.league==="MLS"?"MLS NEXT":f.league)}</span>${esc(shortTeam(f.surfTeam))}</div>
         <div class="t2">${vs}${f.division?` <span style="opacity:.7">· ${esc(f.division)}</span>`:""}</div>
         <div class="t3">${f.coach?`<span>👤 <span class="coach">${esc(f.coach)}</span></span>`:`<span>👤 <em>coach not matched</em></span>`}${f.venue?`<span>📍 ${esc(f.venue)}</span>`:""}<span><a href="${esc(f.url)}" target="_blank" rel="noopener" style="color:var(--muted)">source ↗</a></span></div>
       </div>
