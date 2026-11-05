@@ -4,7 +4,7 @@ One page with every club fixture, pulled hourly from:
 
 | Source | What | How |
 |---|---|---|
-| GotSport | NAL (55967), NECSL Fall 2026 (55964), NEAL (56083), N1 (54245) | club schedule page, club 7671 |
+| GotSport | NAL (55967), NECSL Fall 2026 (55964), NEAL (56083), N1 (54245); tournaments as league `CUP`: NCFC Girls Junior Showcase (52029), IFA Pre-Thanksgiving (55446), NEFC Thanksgiving Showcase (57421) | club schedule page, club 7671 |
 | ECNL RL Girls Northeast 2026-27 (org 13, season 82, event 4310) | Teal division GU13–GU18/19 | TGS / AthleteOne schedule feed |
 | Pre-ECNL Girls Northeast 2026-27 (org 21, season 86, event 4379) | North flight GU11–GU12 | TGS / AthleteOne schedule feed |
 | MLS NEXT Academy | U13–U19 | mlsnexttracker.com team API |

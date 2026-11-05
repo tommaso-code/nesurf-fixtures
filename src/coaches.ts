@@ -78,7 +78,17 @@ export async function loadCoaches(): Promise<{ rows: CoachRow[]; source: string;
 const REGIONS = ["Charlestown", "Metro Boston", "Metro South", "Metro West", "South Shore", "East Boston", "City", "Metro"];
 
 export function parseTeam(name: string, league: string, divisionHint = ""): TeamKey {
-  const n = name.replace(/\s+/g, " ");
+  const n = name.replace(/\s+/g, " ").replace(/(\s*\(MA\))+$/i, "");
+  // Tournament entries ("CUP") carry no league of their own: infer it from the team name so the coach lookup still works
+  if (league === "CUP") {
+    if (/ECNL RL/i.test(n)) league = "ECNL";
+    else if (/Pre ?-?ECNL/i.test(n)) league = "PRE";
+    else if (/\bN1\b/i.test(n)) league = "N1";
+    else if (/MLS NEXT/i.test(n)) league = "MLS";
+    else if (/Pre-MLS|Academy/i.test(n)) league = "NEAL";
+    else if (/\bState (Sky|Royal)\b|U\d+[BG] State/i.test(n)) league = "NAL";
+    else league = "NECSL";
+  }
   let gender: TeamKey["gender"] = "";
   if (/\bGirls\b|\bGU\d|\bG20\d\d|\bU\d+G\b/i.test(n) || /\bGU\d/i.test(divisionHint)) gender = "Girls";
   else if (/\bBoys\b|\bBU\d|\bB20\d\d|\bU\d+B\b/i.test(n) || /\bBU\d/i.test(divisionHint)) gender = "Boys";

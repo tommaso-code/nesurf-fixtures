@@ -63,7 +63,7 @@
   .t3{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:12px;color:var(--muted)}
   .t3 span{display:inline-flex;align-items:center;gap:4px}
   .badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:2px 7px;border-radius:6px;color:#fff;background:var(--navy)}
-  .badge.ECNL{background:var(--teal)} .badge.PRE{background:#0e7490} .badge.MLS{background:#111} .badge.NAL{background:var(--sky)} .badge.NECSL{background:var(--navy-2)} .badge.NEAL{background:#5b21b6} .badge.N1{background:var(--royal)}
+  .badge.ECNL{background:var(--teal)} .badge.PRE{background:#0e7490} .badge.MLS{background:#111} .badge.NAL{background:var(--sky)} .badge.NECSL{background:var(--navy-2)} .badge.NEAL{background:#5b21b6} .badge.N1{background:var(--royal)} .badge.CUP{background:#b45309}
   .ha{font-size:10.5px;font-weight:700;border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--muted)}
   .coach{font-weight:600;color:var(--ink)}
   .score{text-align:right;min-width:74px}
@@ -151,7 +151,7 @@
   try { const saved = JSON.parse(localStorage.getItem("nes-fx-filters") || "{}"); Object.assign(state, saved, { leagues: new Set(saved.leagues || []) }); } catch (e) {}
   const persist = () => { try { localStorage.setItem("nes-fx-filters", JSON.stringify({ ...state, leagues: [...state.leagues] })); } catch (e) {} };
 
-  const LEAGUES = [["NAL","NAL"],["NECSL","NECSL"],["NEAL","NEAL"],["N1","N1"],["ECNL","ECNL RL"],["PRE","Pre-ECNL"],["MLS","MLS NEXT"]];
+  const LEAGUES = [["NAL","NAL"],["NECSL","NECSL"],["NEAL","NEAL"],["N1","N1"],["ECNL","ECNL RL"],["PRE","Pre-ECNL"],["MLS","MLS NEXT"],["CUP","Tournaments"]];
   const todayISO = () => new Intl.DateTimeFormat("en-CA",{timeZone:"America/New_York"}).format(new Date());
   const addDays = (iso,n) => { const d=new Date(iso+"T12:00:00Z"); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10); };
   const fmtDay = iso => { const d=new Date(iso+"T12:00:00Z"); return d.toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric",timeZone:"UTC"}); };
@@ -202,8 +202,8 @@
     return `<div class="card">
       <div class="time">${f.time||"TBD"}<small>${f.isHome?"HOME":"AWAY"}</small></div>
       <div class="teams">
-        <div class="t1"><span class="badge ${f.league}">${esc(f.league==="ECNL"?"ECNL RL":f.league==="PRE"?"Pre-ECNL":f.league==="MLS"?"MLS NEXT":f.league)}</span>${esc(shortTeam(f.surfTeam))}</div>
-        <div class="t2">${vs}${f.division?` <span style="opacity:.7">· ${esc(f.division)}</span>`:""}</div>
+        <div class="t1"><span class="badge ${f.league}">${esc(f.league==="ECNL"?"ECNL RL":f.league==="PRE"?"Pre-ECNL":f.league==="MLS"?"MLS NEXT":f.league==="CUP"?"Tournament":f.league)}</span>${esc(shortTeam(f.surfTeam))}</div>
+        <div class="t2">${vs}${f.league==="CUP"?` <span style="opacity:.8">· ${esc(f.event)}</span>`:""}${f.division?` <span style="opacity:.7">· ${esc(f.division)}</span>`:""}</div>
         <div class="t3">${f.coach?`<span>👤 <span class="coach">${esc(f.coach)}</span></span>`:`<span>👤 <em>coach not matched</em></span>`}${f.venue?`<span>📍 ${esc(f.venue)}</span>`:""}<span><a href="${esc(f.url)}" target="_blank" rel="noopener" style="color:var(--muted)">source ↗</a></span></div>
       </div>
       <div class="score">${score}</div>
@@ -245,7 +245,7 @@
     const ago = data.updatedAt ? Math.round((Date.now()-Date.parse(data.updatedAt))/60000) : null;
     $("#updated").textContent = ago===null ? "No data yet" : `Updated ${ago<1?"just now":ago<60?ago+" min ago":Math.round(ago/60)+" h ago"} · ${new Date(data.updatedAt).toLocaleString("en-US",{timeZone:"America/New_York",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})} ET`;
     const bad = (data.sources||[]).filter(s=>!s.ok);
-    const cap = data.gotsportCapturedAt ? ` GotSport leagues (NAL/NECSL/NEAL/N1) last captured ${new Date(data.gotsportCapturedAt).toLocaleString("en-US",{timeZone:"America/New_York",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})} ET.` : "";
+    const cap = data.gotsportCapturedAt ? ` GotSport leagues & tournaments (NAL/NECSL/NEAL/N1/Cup) last captured ${new Date(data.gotsportCapturedAt).toLocaleString("en-US",{timeZone:"America/New_York",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})} ET.` : "";
     $("#srcSummary").innerHTML = (bad.length ? `<span class="bad">⚠ ${bad.length} source${bad.length>1?"s":""} failed on the last refresh — showing last good data for those.</span>` : `<span class="ok">✓ All ${(data.sources||[]).length} sources refreshed successfully.</span>`) + cap;
     $("#sources").innerHTML = (data.sources||[]).map(s=>`<li><span class="${s.ok?"ok":"bad"}">${s.ok?"✓":"✗"}</span> ${esc(s.name)} — ${s.count} games${s.note?` <em>(${esc(s.note)})</em>`:""}${s.error?` <em>(${esc(s.error)})</em>`:""}</li>`).join("") + (data.coaches?`<li>Coaches: ${data.coaches.count} directory rows (${esc(data.coaches.source)}, as of ${esc(String(data.coaches.asOf).slice(0,10))})</li>`:"");
   }

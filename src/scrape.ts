@@ -4,7 +4,7 @@ import { findCoach, loadCoaches, parseTeam } from "./coaches.ts";
 export type Fixture = {
   id: string;
   source: "gotsport" | "ecnl" | "mlsnext";
-  league: "NAL" | "NECSL" | "NEAL" | "N1" | "ECNL" | "PRE" | "MLS";
+  league: "NAL" | "NECSL" | "NEAL" | "N1" | "ECNL" | "PRE" | "MLS" | "CUP";  // CUP = tournaments/showcases
   leagueLabel: string;
   event: string;
   division: string;
@@ -48,6 +48,10 @@ const DEFAULT_GOTSPORT: GsEvent[] = [
   { id: 55964, league: "NECSL", label: "NECSL Fall 2026" },
   { id: 56083, league: "NEAL", label: "Northeast Academy League 2026-27" },
   { id: 54245, league: "N1", label: "N1 Northeast District 1" },
+  // Tournaments / showcases (league "CUP"); add new ones here as the club enters them
+  { id: 52029, league: "CUP", label: "NCFC visitRaleigh Girls Junior Showcase 2026" },
+  { id: 55446, league: "CUP", label: "IFA Pre-Thanksgiving Invitational 2026" },
+  { id: 57421, league: "CUP", label: "NEFC Thanksgiving Showcase 2026" },
 ];
 const GOTSPORT_CLUB_ID = 7671;
 // TGS / AthleteOne schedule feeds (theecnl.com). Each entry = one flight.
@@ -91,6 +95,8 @@ function time24(t: string): string {
   return `${String(h).padStart(2, "0")}:${m[2]}`;
 }
 function clean(s: string) { return s.replace(/\s+/g, " ").trim(); }
+// Tournament schedules suffix team names with the state ("Team (MA)", sometimes "(MA) (MA)"); drop it so teams group with their league entries
+const stripState = (s: string) => s.replace(/(\s*\((?:MA|NH|CT|RI|ME|VT|NY|NJ|PA)\))+$/i, "").trim();
 
 function finish(f: Omit<Fixture, "sortKey" | "surfTeam" | "opponent" | "isHome" | "result" | "gender" | "age" | "tier" | "region" | "coach">, coachRows: Awaited<ReturnType<typeof loadCoaches>>["rows"]): Fixture | null {
   const homeIsSurf = CLUB_RE.test(f.home), awayIsSurf = CLUB_RE.test(f.away);
@@ -126,7 +132,8 @@ function gotsportRowsToFixtures(ev: GsEvent, rows: string[][], coachRows: any, b
   const out: Fixture[] = [];
   for (const r of rows) {
     if (r.length < 7) continue;
-    const [matchNo, timeCell, home, resTxt, away, venue, division] = r.map(clean);
+    const [matchNo, timeCell, homeRaw, resTxt, awayRaw, venue, division] = r.map(clean);
+    const home = stripState(homeRaw), away = stripState(awayRaw);
     const date = toIsoDate(timeCell);
     const time = normTime(timeCell);
     let status = "Scheduled";
