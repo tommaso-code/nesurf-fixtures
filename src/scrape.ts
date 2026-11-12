@@ -53,6 +53,10 @@ const DEFAULT_GOTSPORT: GsEvent[] = [
   { id: 56005, league: "CUP", label: "Bayside FC Pre-Season Summer Classic 2026" },
   { id: 48855, league: "CUP", label: "Surf Labor Day Classic 2026" },
   { id: 55668, league: "CUP", label: "Seacoast United Labor Day Tournament 2026" },
+  // Columbus Day weekend 2026 (finished)
+  { id: 49757, league: "CUP", label: "CT Rush Fall Classic 2026" },
+  { id: 55670, league: "CUP", label: "Seacoast United Ocean Cup – Cape Cod 2026" },
+  { id: 54446, league: "CUP", label: "NE Force Columbus Day Trident Cup 2026" },
   { id: 52029, league: "CUP", label: "NCFC visitRaleigh Girls Junior Showcase 2026" },
   { id: 55446, league: "CUP", label: "IFA Pre-Thanksgiving Invitational 2026" },
   { id: 57421, league: "CUP", label: "NEFC Thanksgiving Showcase 2026" },
