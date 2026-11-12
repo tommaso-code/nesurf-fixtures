@@ -49,6 +49,10 @@ const DEFAULT_GOTSPORT: GsEvent[] = [
   { id: 56083, league: "NEAL", label: "Northeast Academy League 2026-27" },
   { id: 54245, league: "N1", label: "N1 Northeast District 1" },
   // Tournaments / showcases (league "CUP"); add new ones here as the club enters them
+  // Pre-season / early-season 2026 (finished; kept so season results include them)
+  { id: 56005, league: "CUP", label: "Bayside FC Pre-Season Summer Classic 2026" },
+  { id: 48855, league: "CUP", label: "Surf Labor Day Classic 2026" },
+  { id: 55668, league: "CUP", label: "Seacoast United Labor Day Tournament 2026" },
   { id: 52029, league: "CUP", label: "NCFC visitRaleigh Girls Junior Showcase 2026" },
   { id: 55446, league: "CUP", label: "IFA Pre-Thanksgiving Invitational 2026" },
   { id: 57421, league: "CUP", label: "NEFC Thanksgiving Showcase 2026" },
@@ -132,7 +136,9 @@ function gotsportRowsToFixtures(ev: GsEvent, rows: string[][], coachRows: any, b
   const out: Fixture[] = [];
   for (const r of rows) {
     if (r.length < 7) continue;
-    const [matchNo, timeCell, homeRaw, resTxt, awayRaw, venue, division] = r.map(clean);
+    // Surf-hosted events add a "Host" column before Division (8 cells); the division is then the last cell
+    const [matchNo, timeCell, homeRaw, resTxt, awayRaw, venue] = r.map(clean);
+    const division = clean(r[r.length >= 8 ? 7 : 6] || "");
     const home = stripState(homeRaw), away = stripState(awayRaw);
     const date = toIsoDate(timeCell);
     const time = normTime(timeCell);
