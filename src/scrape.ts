@@ -60,6 +60,8 @@ const DEFAULT_GOTSPORT: GsEvent[] = [
   { id: 52029, league: "CUP", label: "NCFC visitRaleigh Girls Junior Showcase 2026" },
   { id: 55446, league: "CUP", label: "IFA Pre-Thanksgiving Invitational 2026" },
   { id: 57421, league: "CUP", label: "NEFC Thanksgiving Showcase 2026" },
+  // December 2026
+  { id: 56065, league: "CUP", label: "FC Stars College Showcase 2026" },
 ];
 const GOTSPORT_CLUB_ID = 7671;
 // TGS / AthleteOne schedule feeds (theecnl.com). Each entry = one flight.
